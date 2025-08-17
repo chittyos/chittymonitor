@@ -111,6 +111,7 @@ export const insertAppEventSchema = createInsertSchema(appEvents).omit({
 
 export const insertPackageSchema = createInsertSchema(packages).omit({
   id: true,
+  installedAt: true,
   createdAt: true,
   updatedAt: true,
 });

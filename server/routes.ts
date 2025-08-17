@@ -217,11 +217,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Sync packages for an app
       const results = [];
       for (const pkg of packageList) {
-        const packageData = insertPackageSchema.parse({
+        const packageData = {
           ...pkg,
           appId,
           manager: 'chittypm'
-        });
+        };
         
         const installedPackage = await storage.installPackage(packageData);
         results.push(installedPackage);
