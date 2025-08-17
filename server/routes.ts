@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertAppSchema, insertAppEventSchema, insertPackageSchema } from "@shared/schema";
+import { insertAppSchema, insertAppEventSchema, insertPackageSchema, insertWorkflowSchema } from "@shared/schema";
 import { z } from "zod";
 
 const trackingSchema = z.object({
@@ -242,6 +242,99 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error syncing ChittyPM packages:', error);
       res.status(400).json({ error: 'Failed to sync packages' });
+    }
+  });
+
+  // Workflow management endpoints
+  app.get("/api/workflows", async (req, res) => {
+    try {
+      const workflows = await storage.getWorkflows();
+      res.json(workflows);
+    } catch (error) {
+      console.error("Error fetching workflows:", error);
+      res.status(500).json({ error: "Failed to fetch workflows" });
+    }
+  });
+
+  app.get("/api/workflows/stats", async (req, res) => {
+    try {
+      const stats = await storage.getWorkflowStats();
+      res.json(stats);
+    } catch (error) {
+      console.error("Error fetching workflow stats:", error);
+      res.status(500).json({ error: "Failed to fetch workflow stats" });
+    }
+  });
+
+  app.post("/api/workflows", async (req, res) => {
+    try {
+      const workflowData = insertWorkflowSchema.parse(req.body);
+      const workflow = await storage.createWorkflow(workflowData);
+      res.status(201).json(workflow);
+    } catch (error) {
+      console.error("Error creating workflow:", error);
+      res.status(400).json({ error: "Failed to create workflow" });
+    }
+  });
+
+  app.patch("/api/workflows/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updates = insertWorkflowSchema.partial().parse(req.body);
+      const workflow = await storage.updateWorkflow(id, updates);
+      res.json(workflow);
+    } catch (error) {
+      console.error("Error updating workflow:", error);
+      res.status(400).json({ error: "Failed to update workflow" });
+    }
+  });
+
+  // ChittyFlow integration endpoint
+  app.post("/api/chittyflow/workflows", async (req, res) => {
+    try {
+      const chittyflowSchema = z.object({
+        appId: z.string(),
+        workflows: z.array(z.object({
+          name: z.string(),
+          type: z.string(),
+          status: z.string(),
+          trigger: z.string().optional(),
+          branch: z.string().optional(),
+          commit: z.string().optional(),
+          duration: z.number().optional(),
+          metadata: z.any().optional(),
+        }))
+      });
+
+      const { appId, workflows } = chittyflowSchema.parse(req.body);
+      
+      const createdWorkflows = [];
+      for (const wf of workflows) {
+        const workflowData = {
+          appId,
+          name: wf.name,
+          type: wf.type,
+          status: wf.status,
+          trigger: wf.trigger,
+          branch: wf.branch,
+          commit: wf.commit,
+          duration: wf.duration,
+          startedAt: wf.status === 'running' ? new Date() : undefined,
+          completedAt: wf.status === 'success' || wf.status === 'failed' ? new Date() : undefined,
+          metadata: wf.metadata,
+        };
+        
+        const createdWorkflow = await storage.createWorkflow(workflowData);
+        createdWorkflows.push(createdWorkflow);
+      }
+
+      res.json({
+        synced: createdWorkflows.length,
+        workflows: createdWorkflows
+      });
+    } catch (error) {
+      console.error("Error syncing ChittyFlow workflows:", error);
+      res.status(400).json({ error: "Failed to sync workflows" });
     }
   });
 

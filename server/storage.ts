@@ -255,6 +255,79 @@ export class DatabaseStorage implements IStorage {
       recentInstalls
     };
   }
+
+  async getWorkflows(): Promise<Workflow[]> {
+    return await db.select().from(workflows).orderBy(desc(workflows.createdAt));
+  }
+
+  async getAppWorkflows(appId: string): Promise<Workflow[]> {
+    return await db.select().from(workflows).where(eq(workflows.appId, appId)).orderBy(desc(workflows.createdAt));
+  }
+
+  async createWorkflow(workflowData: InsertWorkflow): Promise<Workflow> {
+    const [workflow] = await db.insert(workflows).values(workflowData).returning();
+    return workflow;
+  }
+
+  async updateWorkflow(id: string, updates: Partial<InsertWorkflow>): Promise<Workflow> {
+    const [workflow] = await db.update(workflows).set({ ...updates, updatedAt: new Date() }).where(eq(workflows.id, id)).returning();
+    return workflow;
+  }
+
+  async getWorkflowStats(): Promise<{
+    totalWorkflows: number;
+    workflowsByStatus: { status: string; count: number; percentage: number; }[];
+    workflowsByType: { type: string; count: number; percentage: number; }[];
+    recentWorkflows: Workflow[];
+  }> {
+    // Get total workflows
+    const totalResult = await db.select({ count: count() }).from(workflows);
+    const totalWorkflows = totalResult[0].count;
+
+    // Get workflows by status
+    const statusResult = await db
+      .select({
+        status: workflows.status,
+        count: count(),
+      })
+      .from(workflows)
+      .groupBy(workflows.status);
+
+    const workflowsByStatus = statusResult.map(row => ({
+      status: row.status,
+      count: row.count,
+      percentage: totalWorkflows > 0 ? Math.round((row.count / totalWorkflows) * 100) : 0,
+    }));
+
+    // Get workflows by type
+    const typeResult = await db
+      .select({
+        type: workflows.type,
+        count: count(),
+      })
+      .from(workflows)
+      .groupBy(workflows.type);
+
+    const workflowsByType = typeResult.map(row => ({
+      type: row.type,
+      count: row.count,
+      percentage: totalWorkflows > 0 ? Math.round((row.count / totalWorkflows) * 100) : 0,
+    }));
+
+    // Get recent workflows
+    const recentWorkflows = await db
+      .select()
+      .from(workflows)
+      .orderBy(desc(workflows.createdAt))
+      .limit(10);
+
+    return {
+      totalWorkflows,
+      workflowsByStatus,
+      workflowsByType,
+      recentWorkflows,
+    };
+  }
 }
 
 export const storage = new DatabaseStorage();
