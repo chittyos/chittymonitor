@@ -30,8 +30,9 @@ Preferred communication style: Simple, everyday language.
 ### Database Schema
 - **Users Table**: Stores user information including ChittyID integration
 - **Apps Table**: Tracks connected applications with platform-specific metadata
-- **App Events Table**: Logs application lifecycle events (startup, shutdown, heartbeat)
-- **Relationships**: One-to-many relationships between users and apps, apps and events
+- **App Events Table**: Logs application lifecycle events (startup, shutdown, heartbeat, package operations)
+- **Packages Table**: Tracks installed packages across applications with ChittyPM integration
+- **Relationships**: One-to-many relationships between users and apps, apps and events/packages
 
 ### Authentication & Authorization
 - **ChittyID Integration**: OAuth-style flow for user authentication
@@ -76,6 +77,8 @@ Preferred communication style: Simple, everyday language.
 - **Node.js**: Server runtime environment
 
 ### Third-party Integrations
+- **ChittyPM Integration**: Package management tracking and synchronization with ChittyOS package manager
+- **ChittyID Authentication**: OAuth-style authentication flow for user identity management
 - **Platform Detection**: Support for Replit, GitHub, Vercel platform metadata
 - **Git Integration**: Repository information tracking
 - **Environment Detection**: Development vs production environment handling

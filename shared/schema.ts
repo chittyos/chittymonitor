@@ -38,10 +38,30 @@ export const apps = pgTable("apps", {
 export const appEvents = pgTable("app_events", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   appId: varchar("app_id").references(() => apps.id).notNull(),
-  event: text("event").notNull(), // startup, shutdown, heartbeat
+  event: text("event").notNull(), // startup, shutdown, heartbeat, package_install, package_update, package_remove
   timestamp: timestamp("timestamp").notNull(),
   data: jsonb("data"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const packages = pgTable("packages", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  appId: varchar("app_id").references(() => apps.id).notNull(),
+  name: text("name").notNull(),
+  version: text("version").notNull(),
+  manager: text("manager").notNull(), // npm, pip, chittypm, etc.
+  description: text("description"),
+  homepage: text("homepage"),
+  repository: text("repository"),
+  license: text("license"),
+  dependencies: jsonb("dependencies"), // list of dependency names and versions
+  devDependencies: jsonb("dev_dependencies"),
+  size: integer("size"), // package size in bytes
+  downloadCount: integer("download_count").default(0),
+  lastUpdated: timestamp("last_updated"),
+  installedAt: timestamp("installed_at").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 export const usersRelations = relations(users, ({ many }) => ({
@@ -54,11 +74,19 @@ export const appsRelations = relations(apps, ({ one, many }) => ({
     references: [users.id],
   }),
   events: many(appEvents),
+  packages: many(packages),
 }));
 
 export const appEventsRelations = relations(appEvents, ({ one }) => ({
   app: one(apps, {
     fields: [appEvents.appId],
+    references: [apps.id],
+  }),
+}));
+
+export const packagesRelations = relations(packages, ({ one }) => ({
+  app: one(apps, {
+    fields: [packages.appId],
     references: [apps.id],
   }),
 }));
@@ -81,9 +109,17 @@ export const insertAppEventSchema = createInsertSchema(appEvents).omit({
   createdAt: true,
 });
 
+export const insertPackageSchema = createInsertSchema(packages).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertApp = z.infer<typeof insertAppSchema>;
 export type App = typeof apps.$inferSelect;
 export type InsertAppEvent = z.infer<typeof insertAppEventSchema>;
 export type AppEvent = typeof appEvents.$inferSelect;
+export type InsertPackage = z.infer<typeof insertPackageSchema>;
+export type Package = typeof packages.$inferSelect;

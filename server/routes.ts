@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertAppSchema, insertAppEventSchema } from "@shared/schema";
+import { insertAppSchema, insertAppEventSchema, insertPackageSchema } from "@shared/schema";
 import { z } from "zod";
 
 const trackingSchema = z.object({
@@ -151,6 +151,97 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error fetching stats:', error);
       res.status(500).json({ error: 'Failed to fetch stats' });
+    }
+  });
+
+  // Package management endpoints
+  app.get('/api/packages', async (req, res) => {
+    try {
+      const packages = await storage.getPackages();
+      res.json(packages);
+    } catch (error) {
+      console.error('Error fetching packages:', error);
+      res.status(500).json({ error: 'Failed to fetch packages' });
+    }
+  });
+
+  app.get('/api/apps/:id/packages', async (req, res) => {
+    try {
+      const packages = await storage.getAppPackages(req.params.id);
+      res.json(packages);
+    } catch (error) {
+      console.error('Error fetching app packages:', error);
+      res.status(500).json({ error: 'Failed to fetch app packages' });
+    }
+  });
+
+  app.post('/api/packages', async (req, res) => {
+    try {
+      const packageData = insertPackageSchema.parse(req.body);
+      const pkg = await storage.installPackage(packageData);
+      
+      // Also create a package install event
+      await storage.createAppEvent({
+        appId: packageData.appId,
+        event: 'package_install',
+        timestamp: new Date(),
+        data: { 
+          package: packageData.name, 
+          version: packageData.version, 
+          manager: packageData.manager 
+        }
+      });
+      
+      res.json(pkg);
+    } catch (error) {
+      console.error('Error installing package:', error);
+      res.status(400).json({ error: 'Failed to install package' });
+    }
+  });
+
+  app.get('/api/packages/stats', async (req, res) => {
+    try {
+      const stats = await storage.getPackageStats();
+      res.json(stats);
+    } catch (error) {
+      console.error('Error fetching package stats:', error);
+      res.status(500).json({ error: 'Failed to fetch package stats' });
+    }
+  });
+
+  // ChittyPM specific endpoint for package sync
+  app.post('/api/chittypm/sync', async (req, res) => {
+    try {
+      const { appId, packages: packageList } = req.body;
+      
+      // Sync packages for an app
+      const results = [];
+      for (const pkg of packageList) {
+        const packageData = insertPackageSchema.parse({
+          ...pkg,
+          appId,
+          manager: 'chittypm'
+        });
+        
+        const installedPackage = await storage.installPackage(packageData);
+        results.push(installedPackage);
+      }
+      
+      // Create a sync event
+      await storage.createAppEvent({
+        appId,
+        event: 'package_sync',
+        timestamp: new Date(),
+        data: { 
+          source: 'chittypm', 
+          count: results.length 
+        }
+      });
+      
+      res.json({ synced: results.length, packages: results });
+    } catch (error) {
+      console.error('Error syncing ChittyPM packages:', error);
+      res.status(400).json({ error: 'Failed to sync packages' });
     }
   });
 

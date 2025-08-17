@@ -1,4 +1,4 @@
-import { users, apps, appEvents, type User, type InsertUser, type App, type InsertApp, type AppEvent, type InsertAppEvent } from "@shared/schema";
+import { users, apps, appEvents, packages, type User, type InsertUser, type App, type InsertApp, type AppEvent, type InsertAppEvent, type Package, type InsertPackage } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, count, sql } from "drizzle-orm";
 
@@ -16,6 +16,18 @@ interface IStorage {
   // Event methods
   createAppEvent(eventData: InsertAppEvent): Promise<AppEvent>;
   getRecentEvents(limit: number): Promise<AppEvent[]>;
+  
+  // Package methods
+  getPackages(): Promise<Package[]>;
+  getAppPackages(appId: string): Promise<Package[]>;
+  installPackage(packageData: InsertPackage): Promise<Package>;
+  updatePackage(id: string, updates: Partial<InsertPackage>): Promise<Package>;
+  uninstallPackage(id: string): Promise<void>;
+  getPackageStats(): Promise<{
+    totalPackages: number;
+    packagesByManager: { manager: string; count: number; percentage: number; }[];
+    recentInstalls: Package[];
+  }>;
   
   // Stats methods
   getStats(): Promise<{
@@ -146,6 +158,89 @@ export class DatabaseStorage implements IStorage {
       claudeApps: Number(claudeApps),
       avgUptime: activeApps > 0 ? (activeApps / totalApps) * 100 : 0,
       platformDistribution
+    };
+  }
+
+  // Package management methods
+  async getPackages(): Promise<Package[]> {
+    return await db
+      .select()
+      .from(packages)
+      .orderBy(desc(packages.installedAt));
+  }
+
+  async getAppPackages(appId: string): Promise<Package[]> {
+    return await db
+      .select()
+      .from(packages)
+      .where(eq(packages.appId, appId))
+      .orderBy(desc(packages.installedAt));
+  }
+
+  async installPackage(packageData: InsertPackage): Promise<Package> {
+    const [pkg] = await db
+      .insert(packages)
+      .values({
+        ...packageData,
+        installedAt: new Date(),
+      })
+      .returning();
+    return pkg;
+  }
+
+  async updatePackage(id: string, updates: Partial<InsertPackage>): Promise<Package> {
+    const [pkg] = await db
+      .update(packages)
+      .set({
+        ...updates,
+        updatedAt: new Date(),
+      })
+      .where(eq(packages.id, id))
+      .returning();
+    return pkg;
+  }
+
+  async uninstallPackage(id: string): Promise<void> {
+    await db
+      .delete(packages)
+      .where(eq(packages.id, id));
+  }
+
+  async getPackageStats(): Promise<{
+    totalPackages: number;
+    packagesByManager: { manager: string; count: number; percentage: number; }[];
+    recentInstalls: Package[];
+  }> {
+    const totalPackagesResult = await db
+      .select({ count: count() })
+      .from(packages);
+
+    const managerDistResult = await db
+      .select({
+        manager: packages.manager,
+        count: count()
+      })
+      .from(packages)
+      .groupBy(packages.manager);
+
+    const recentInstalls = await db
+      .select()
+      .from(packages)
+      .orderBy(desc(packages.installedAt))
+      .limit(10);
+
+    const totalPackages = Number(totalPackagesResult[0]?.count || 0);
+
+    const packagesByManager = managerDistResult.map(p => ({
+      manager: p.manager,
+      count: Number(p.count),
+      percentage: totalPackages > 0 ? (Number(p.count) / totalPackages) * 100 : 0
+    }));
+
+    return {
+      totalPackages,
+      packagesByManager,
+      recentInstalls
     };
   }
 }
