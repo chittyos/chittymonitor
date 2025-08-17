@@ -2,9 +2,9 @@
 
 ## Overview
 
-ChittyBeacon is a comprehensive application monitoring and tracking dashboard built as part of the ChittyOS ecosystem. The application provides real-time monitoring of connected applications, tracking their status, performance metrics, and activity across various platforms. It features a React-based frontend with a modern dark theme UI and an Express.js backend with PostgreSQL database integration.
+ChittyBeacon is a comprehensive application monitoring and tracking dashboard built as part of the ChittyOS ecosystem. The application provides real-time monitoring of connected applications, tracking their status, performance metrics, and activity across various platforms. It features a React-based frontend with a modern dark theme UI, engaging hero section with live metrics, and an Express.js backend with PostgreSQL database integration.
 
-The system is designed to track applications across multiple platforms (Replit, GitHub, Vercel, etc.) and provides analytics on app distribution, activity patterns, and health monitoring. It integrates with the broader ChittyID identity system and supports OAuth-style authentication flows.
+The system is designed to track applications across multiple platforms (Replit, GitHub, Vercel, etc.) and provides analytics on app distribution, activity patterns, and health monitoring. It integrates with the broader ChittyID identity system and supports OAuth-style authentication flows for easy onboarding and app synchronization.
 
 ## User Preferences
 
