@@ -64,6 +64,23 @@ export const packages = pgTable("packages", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+export const workflows = pgTable("workflows", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  appId: varchar("app_id").references(() => apps.id).notNull(),
+  name: text("name").notNull(),
+  type: text("type").notNull(), // deployment, build, test, chittyflow, etc.
+  status: text("status").notNull(), // pending, running, success, failed, cancelled
+  trigger: text("trigger"), // push, pull_request, manual, scheduled, chittyflow_event
+  branch: text("branch"),
+  commit: text("commit"),
+  duration: integer("duration"), // duration in seconds
+  startedAt: timestamp("started_at"),
+  completedAt: timestamp("completed_at"),
+  metadata: jsonb("metadata"), // workflow-specific data, logs, artifacts
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 export const usersRelations = relations(users, ({ many }) => ({
   apps: many(apps),
 }));
@@ -75,6 +92,7 @@ export const appsRelations = relations(apps, ({ one, many }) => ({
   }),
   events: many(appEvents),
   packages: many(packages),
+  workflows: many(workflows),
 }));
 
 export const appEventsRelations = relations(appEvents, ({ one }) => ({
@@ -87,6 +105,13 @@ export const appEventsRelations = relations(appEvents, ({ one }) => ({
 export const packagesRelations = relations(packages, ({ one }) => ({
   app: one(apps, {
     fields: [packages.appId],
+    references: [apps.id],
+  }),
+}));
+
+export const workflowsRelations = relations(workflows, ({ one }) => ({
+  app: one(apps, {
+    fields: [workflows.appId],
     references: [apps.id],
   }),
 }));
@@ -116,6 +141,12 @@ export const insertPackageSchema = createInsertSchema(packages).omit({
   updatedAt: true,
 });
 
+export const insertWorkflowSchema = createInsertSchema(workflows).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertApp = z.infer<typeof insertAppSchema>;
@@ -124,3 +155,5 @@ export type InsertAppEvent = z.infer<typeof insertAppEventSchema>;
 export type AppEvent = typeof appEvents.$inferSelect;
 export type InsertPackage = z.infer<typeof insertPackageSchema>;
 export type Package = typeof packages.$inferSelect;
+export type InsertWorkflow = z.infer<typeof insertWorkflowSchema>;
+export type Workflow = typeof workflows.$inferSelect;

@@ -1,4 +1,4 @@
-import { users, apps, appEvents, packages, type User, type InsertUser, type App, type InsertApp, type AppEvent, type InsertAppEvent, type Package, type InsertPackage } from "@shared/schema";
+import { users, apps, appEvents, packages, workflows, type User, type InsertUser, type App, type InsertApp, type AppEvent, type InsertAppEvent, type Package, type InsertPackage, type Workflow, type InsertWorkflow } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, count, sql } from "drizzle-orm";
 
@@ -27,6 +27,18 @@ interface IStorage {
     totalPackages: number;
     packagesByManager: { manager: string; count: number; percentage: number; }[];
     recentInstalls: Package[];
+  }>;
+  
+  // Workflow methods
+  getWorkflows(): Promise<Workflow[]>;
+  getAppWorkflows(appId: string): Promise<Workflow[]>;
+  createWorkflow(workflowData: InsertWorkflow): Promise<Workflow>;
+  updateWorkflow(id: string, updates: Partial<InsertWorkflow>): Promise<Workflow>;
+  getWorkflowStats(): Promise<{
+    totalWorkflows: number;
+    workflowsByStatus: { status: string; count: number; percentage: number; }[];
+    workflowsByType: { type: string; count: number; percentage: number; }[];
+    recentWorkflows: Workflow[];
   }>;
   
   // Stats methods
