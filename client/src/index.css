@@ -1,0 +1,139 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(210, 30%, 8%);
+  --foreground: hsl(0, 0%, 98%);
+  --card: hsl(210, 30%, 12%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --popover: hsl(210, 30%, 12%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --primary: hsl(171, 100%, 41%);
+  --primary-foreground: hsl(210, 30%, 8%);
+  --secondary: hsl(210, 25%, 20%);
+  --secondary-foreground: hsl(0, 0%, 98%);
+  --muted: hsl(210, 25%, 15%);
+  --muted-foreground: hsl(210, 10%, 60%);
+  --accent: hsl(210, 30%, 12%);
+  --accent-foreground: hsl(171, 100%, 41%);
+  --destructive: hsl(0, 84%, 60%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --border: hsl(210, 25%, 20%);
+  --input: hsl(210, 30%, 15%);
+  --ring: hsl(171, 100%, 41%);
+  --chart-1: hsl(171, 100%, 41%);
+  --chart-2: hsl(200, 100%, 50%);
+  --chart-3: hsl(280, 100%, 70%);
+  --chart-4: hsl(40, 100%, 60%);
+  --chart-5: hsl(320, 100%, 60%);
+  --sidebar: hsl(210, 30%, 12%);
+  --sidebar-foreground: hsl(0, 0%, 90%);
+  --sidebar-primary: hsl(171, 100%, 41%);
+  --sidebar-primary-foreground: hsl(210, 30%, 8%);
+  --sidebar-accent: hsl(210, 30%, 12%);
+  --sidebar-accent-foreground: hsl(171, 100%, 41%);
+  --sidebar-border: hsl(210, 25%, 20%);
+  --sidebar-ring: hsl(171, 100%, 41%);
+  --chitty-dark: hsl(214, 35%, 6%);
+  --chitty-dark-secondary: hsl(210, 25%, 12%);
+  --chitty-green: hsl(171, 100%, 41%);
+  --chitty-green-dark: hsl(171, 83%, 36%);
+  --chitty-border: hsl(210, 25%, 20%);
+  --chitty-text-secondary: hsl(210, 10%, 60%);
+  --font-sans: 'Inter', 'ui-sans-serif', 'system-ui';
+  --font-serif: 'Georgia', 'serif';
+  --font-mono: 'Menlo', 'monospace';
+  --radius: 0.5rem;
+}
+
+.dark {
+  --background: hsl(214, 35%, 6%);
+  --foreground: hsl(0, 0%, 98%);
+  --card: hsl(210, 30%, 12%);
+  --card-foreground: hsl(0, 0%, 90%);
+  --popover: hsl(214, 35%, 6%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --primary: hsl(171, 100%, 41%);
+  --primary-foreground: hsl(214, 35%, 6%);
+  --secondary: hsl(210, 25%, 20%);
+  --secondary-foreground: hsl(0, 0%, 98%);
+  --muted: hsl(210, 25%, 15%);
+  --muted-foreground: hsl(210, 10%, 60%);
+  --accent: hsl(210, 30%, 8%);
+  --accent-foreground: hsl(171, 100%, 41%);
+  --destructive: hsl(0, 84%, 60%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --border: hsl(210, 25%, 20%);
+  --input: hsl(210, 30%, 15%);
+  --ring: hsl(171, 100%, 41%);
+  --chart-1: hsl(171, 100%, 41%);
+  --chart-2: hsl(200, 100%, 50%);
+  --chart-3: hsl(280, 100%, 70%);
+  --chart-4: hsl(40, 100%, 60%);
+  --chart-5: hsl(320, 100%, 60%);
+  --sidebar: hsl(210, 30%, 12%);
+  --sidebar-foreground: hsl(0, 0%, 90%);
+  --sidebar-primary: hsl(171, 100%, 41%);
+  --sidebar-primary-foreground: hsl(214, 35%, 6%);
+  --sidebar-accent: hsl(210, 30%, 8%);
+  --sidebar-accent-foreground: hsl(171, 100%, 41%);
+  --sidebar-border: hsl(210, 25%, 20%);
+  --sidebar-ring: hsl(171, 100%, 41%);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    background-color: hsl(var(--chitty-dark));
+    color: hsl(0, 0%, 98%);
+    font-family: var(--font-sans);
+  }
+}
+
+@layer utilities {
+  .bg-chitty-dark {
+    background-color: hsl(var(--chitty-dark));
+  }
+  
+  .bg-chitty-dark-secondary {
+    background-color: hsl(var(--chitty-dark-secondary));
+  }
+  
+  .bg-chitty-green {
+    background-color: hsl(var(--chitty-green));
+  }
+  
+  .bg-chitty-green-dark {
+    background-color: hsl(var(--chitty-green-dark));
+  }
+  
+  .text-chitty-green {
+    color: hsl(var(--chitty-green));
+  }
+  
+  .text-chitty-green-dark {
+    color: hsl(var(--chitty-green-dark));
+  }
+  
+  .text-chitty-text-secondary {
+    color: hsl(var(--chitty-text-secondary));
+  }
+  
+  .border-chitty-border {
+    border-color: hsl(var(--chitty-border));
+  }
+  
+  .border-chitty-green {
+    border-color: hsl(var(--chitty-green));
+  }
+
+  .text-chitty-dark {
+    color: hsl(var(--chitty-dark));
+  }
+}
