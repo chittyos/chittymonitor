@@ -4,7 +4,7 @@
 
 ChittyBeacon is a comprehensive application monitoring and tracking dashboard built as part of the ChittyOS ecosystem. The application provides real-time monitoring of connected applications, tracking their status, performance metrics, workflow pipelines, and activity across various platforms. It features a React-based frontend with a modern dark theme UI, engaging hero section with live metrics, and an Express.js backend with PostgreSQL database integration.
 
-The system is designed to track applications across multiple platforms (Replit, GitHub, Vercel, etc.) and provides analytics on app distribution, activity patterns, workflow execution, and health monitoring. It integrates with ChittyPM for package management, ChittyFlow for workflow automation, and the broader ChittyID identity system with OAuth-style authentication flows for easy onboarding and synchronization.
+The system is designed to track applications across multiple platforms (Replit, GitHub, Vercel, etc.) and provides analytics on app distribution, activity patterns, workflow execution, and health monitoring. It integrates with ChittyPM for package management, ChittyFlow for workflow automation, ChittyIntel for AI-powered analytics and insights, and the broader ChittyID identity system with OAuth-style authentication flows for easy onboarding and synchronization.
 
 ## User Preferences
 
@@ -80,6 +80,7 @@ Preferred communication style: Simple, everyday language.
 ### Third-party Integrations
 - **ChittyPM Integration**: Package management tracking and synchronization with ChittyOS package manager
 - **ChittyFlow Integration**: Workflow automation, CI/CD pipeline tracking, and deployment monitoring
+- **ChittyIntel Integration**: AI-powered analytics, predictive insights, anomaly detection, and intelligent recommendations
 - **ChittyID Authentication**: OAuth-style authentication flow for user identity management
 - **Platform Detection**: Support for Replit, GitHub, Vercel platform metadata
 - **Git Integration**: Repository information tracking and branch monitoring

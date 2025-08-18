@@ -8,6 +8,7 @@ import RecentActivity from "@/components/dashboard/recent-activity";
 import ConnectedApps from "@/components/dashboard/connected-apps";
 import { ChittyPMSection } from "@/components/dashboard/chittypm-section";
 import { ChittyFlowSection } from "@/components/dashboard/chittyflow-section";
+import { ChittyIntelSection } from "@/components/dashboard/chittyintel-section";
 import OnboardingModal from "@/components/onboarding/onboarding-modal";
 import QuickSetupModal from "@/components/onboarding/quick-setup-modal";
 import { cn } from "@/lib/utils";
@@ -223,6 +224,10 @@ export default function Dashboard() {
 
             <div className="mt-8">
               <ChittyFlowSection />
+            </div>
+
+            <div className="mt-8">
+              <ChittyIntelSection />
             </div>
           </div>
         </main>
