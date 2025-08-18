@@ -107,11 +107,11 @@
 
 @layer utilities {
   .bg-chitty-dark {
-    background-color: hsl(var(--chitty-dark));
+    background-color: hsl(var(--chitty-dark)) !important;
   }
   
   .bg-chitty-dark-secondary {
-    background-color: hsl(var(--chitty-dark-secondary));
+    background-color: hsl(var(--chitty-dark-secondary)) !important;
   }
   
   .bg-chitty-green {
@@ -145,4 +145,24 @@
   .text-chitty-dark {
     color: hsl(var(--chitty-dark));
   }
+}
+
+/* Force dark theme override for any stubborn white backgrounds */
+nav, aside, .sidebar, .top-nav {
+  background-color: hsl(210, 25%, 12%) !important;
+  color: hsl(0, 0%, 98%) !important;
+}
+
+/* Global dark override */
+* {
+  background-color: inherit;
+}
+
+/* Specific overrides for layout components */
+[data-testid="sidebar"] {
+  background-color: hsl(210, 25%, 12%) !important;
+}
+
+[data-testid="nav-top"] {
+  background-color: hsl(210, 25%, 12%) !important;
 }
