@@ -16,7 +16,7 @@ const navigation = [
 
 export default function Sidebar({ onQuickSetup }: SidebarProps) {
   return (
-    <aside className="w-64 bg-chitty-dark-secondary border-r border-chitty-border min-h-screen" data-testid="sidebar">
+    <aside className="w-64 bg-chitty-dark-secondary border-r border-chitty-border min-h-screen flex-shrink-0" data-testid="sidebar">
       <div className="p-6">
         <Card className="bg-chitty-dark border-chitty-green/20 mb-6">
           <CardContent className="p-4">

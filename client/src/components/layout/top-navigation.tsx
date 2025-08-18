@@ -4,7 +4,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 export default function TopNavigation() {
   return (
-    <nav className="bg-chitty-dark-secondary border-b border-chitty-border" data-testid="nav-top">
+    <nav className="bg-chitty-dark-secondary border-b border-chitty-border w-full" data-testid="nav-top">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center space-x-4">

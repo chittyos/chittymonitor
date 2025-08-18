@@ -203,12 +203,12 @@ export function ChittyIntelSection() {
                         </Badge>
                         {workflow.metadata && typeof workflow.metadata === 'object' && 'insights' in workflow.metadata && (
                           <span className="text-xs text-gray-400">
-                            {(workflow.metadata as any).insights} insights
+                            {String((workflow.metadata as any).insights)} insights
                           </span>
                         )}
                         {workflow.metadata && typeof workflow.metadata === 'object' && 'confidence' in workflow.metadata && (
                           <span className="text-xs text-gray-400">
-                            {((workflow.metadata as any).confidence * 100).toFixed(0)}% confidence
+                            {(Number((workflow.metadata as any).confidence) * 100).toFixed(0)}% confidence
                           </span>
                         )}
                       </div>

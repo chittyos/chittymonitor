@@ -94,6 +94,15 @@
     color: hsl(0, 0%, 98%);
     font-family: var(--font-sans);
   }
+  
+  html {
+    background-color: hsl(var(--chitty-dark));
+  }
+  
+  #root {
+    background-color: hsl(var(--chitty-dark));
+    min-height: 100vh;
+  }
 }
 
 @layer utilities {

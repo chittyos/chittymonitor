@@ -18,10 +18,13 @@ function Router() {
 }
 
 function App() {
+  // Apply dark mode to document element
+  document.documentElement.classList.add('dark');
+  
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <div className="dark">
+        <div className="min-h-screen bg-chitty-dark text-white">
           <Toaster />
           <Router />
         </div>
