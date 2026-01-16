@@ -1,0 +1,35 @@
+# ChittyConnect Configuration for chittymonitor
+service:
+  name: chittymonitor
+  display_name: Chittymonitor
+  type: service
+  tier: 3
+  organization: CHITTYOS
+  chitty_id: ${CHITTYMONITOR_SERVICE_ID}
+  domains:
+    production: monitor.chitty.cc
+
+onboarding:
+  endpoint: https://get.chitty.cc/api/onboard
+  provisions: [chitty_id, service_token, certificate, trust_chain]
+
+auth:
+  provider: chittyauth
+  endpoint: https://auth.chitty.cc
+  service_token:
+    source: chittyconnect
+    key: CHITTYMONITOR_SERVICE_TOKEN
+
+secrets:
+  provider: chittyconnect
+  vault: 1password
+  paths:
+    production: op://ChittyOS/chittymonitor-prod
+
+github:
+  repository: CHITTYOS/chittymonitor
+
+monitoring:
+  health:
+    endpoint: /health
+    interval: 60s
