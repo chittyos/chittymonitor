@@ -1,0 +1,49 @@
+name: Deploy ChittyMonitor Worker
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'worker/**'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22.x'
+
+      - name: Install dependencies
+        working-directory: worker
+        run: npm ci
+
+      - name: Type check
+        working-directory: worker
+        run: npx tsc --noEmit
+
+      - name: Deploy to Cloudflare Workers
+        working-directory: worker
+        run: npx wrangler deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: Verify deployment
+        run: |
+          sleep 5
+          STATUS=$(curl -s https://monitor.chitty.cc/health --max-time 10 | python3 -c "import sys,json; print(json.load(sys.stdin).get('status','FAIL'))" 2>/dev/null || echo "FAIL")
+          echo "Health: $STATUS"
+          [ "$STATUS" = "ok" ] || echo "::warning::Health check returned $STATUS"
+
+      - name: Notify ChittyChronicle
+        if: always()
+        continue-on-error: true
+        run: |
+          curl -s -X POST "https://connect.chitty.cc/api/chittychronicle/events" \
+            -H "Content-Type: application/json" \
+            -d '{"source":"github-actions","event":"deploy.${{ job.status }}","worker":"chittymonitor","sha":"${{ github.sha }}"}'
