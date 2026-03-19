@@ -19,10 +19,6 @@
     }
   ],
 
-  "kv_namespaces": [
-    { "binding": "MONITOR_CACHE", "id": "" }
-  ],
-
   "triggers": {
     "crons": ["*/5 * * * *"]
   },
