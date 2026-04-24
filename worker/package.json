@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "agents": "^0.7.0",
-    "hono": "^4.7.0"
+    "hono": "^4.12.15"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260316.0",
