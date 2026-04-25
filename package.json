@@ -102,5 +102,6 @@
   },
   "optionalDependencies": {
     "bufferutil": "^4.0.8"
-  }
+  },
+  "description": "ChittyOS application monitoring and health dashboard"
 }
