@@ -315,7 +315,11 @@ export class MonitorAgent extends Agent<Env> {
     const results: HealthResult[] = [];
     const now = new Date().toISOString();
 
-    const checks = SERVICES.map(async (svc): Promise<HealthResult> => {
+    // Concurrency-limited health checks (batch=6) to avoid Workers in-flight fetch() cap.
+    // Fanning all 23 services simultaneously exhausts the runtime limit → stalled responses
+    // get cancelled → scriptThrewException. Batching by 6 keeps well under the limit.
+    const CONCURRENCY = 6;
+    const checkOne = async (svc: typeof SERVICES[number]): Promise<HealthResult> => {
       const start = Date.now();
       try {
         const resp = await fetch(`https://${svc}.chitty.cc/health`, { signal: AbortSignal.timeout(5000) });
@@ -331,6 +335,7 @@ export class MonitorAgent extends Agent<Env> {
             status = 'ok';
           }
         } else {
+          await resp.body?.cancel(); // drain unread body to release connection slot
           status = `http_${resp.status}`;
         }
         return { service: svc, status, response_ms: ms, checked_at: now, error: null };
@@ -338,9 +343,15 @@ export class MonitorAgent extends Agent<Env> {
         const ms = Date.now() - start;
         return { service: svc, status: 'down', response_ms: ms, checked_at: now, error: String(err) };
       }
-    });
+    };
 
-    const settled = await Promise.allSettled(checks);
+    const allResults: PromiseSettledResult<HealthResult>[] = [];
+    for (let i = 0; i < SERVICES.length; i += CONCURRENCY) {
+      const batch = SERVICES.slice(i, i + CONCURRENCY);
+      const batchSettled = await Promise.allSettled(batch.map(checkOne));
+      allResults.push(...batchSettled);
+    }
+    const settled = allResults;
     for (const r of settled) {
       const result = r.status === 'fulfilled'
         ? r.value
