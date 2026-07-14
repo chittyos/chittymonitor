@@ -167,3 +167,5 @@ export default {
         .catch((e: unknown) => console.error("[cron] health sweep failed:", String(e)))
     );
   },
+
+} satisfies ExportedHandler<Env>;
