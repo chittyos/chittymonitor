@@ -156,16 +156,14 @@ export default {
   },
 
   async scheduled(_controller: ScheduledController, env: Env, ctx: ExecutionContext): Promise<void> {
-    // Direct DO method calls on a stub are invalid — runHealthSweep() must be invoked
-    // via the DO stub's fetch() interface. We send a GET to /api/health/sweep which
-    // the Hono router handles and calls agent.runHealthSweep() through the proper
-    // DO RPC path used by routeAgentRequest.
-    const id = env.MONITOR_AGENT.idFromName('singleton');
-    const stub = env.MONITOR_AGENT.get(id);
+    // Trigger health sweep via a self-fetch to the Worker's own endpoint.
+    // Direct DO method calls on a stub require CF RPC setup; using a self-fetch
+    // routes through the Hono handler which correctly proxies into the DO.
     ctx.waitUntil(
-      stub.fetch(new Request('https://monitor.internal/api/health/sweep'))
+      fetch(new Request("https://monitor.chitty.cc/api/health/sweep"), {
+        headers: { "X-Cron-Trigger": "1" },
+      })
         .then((r) => r.body?.cancel())
-        .catch((e: unknown) => console.error('[cron] health sweep error:', String(e)))
+        .catch((e: unknown) => console.error("[cron] health sweep failed:", String(e)))
     );
   },
-} satisfies ExportedHandler<Env>;
