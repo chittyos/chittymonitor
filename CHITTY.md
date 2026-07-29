@@ -64,7 +64,7 @@ worker**. Do not re-introduce a Neon dependency into the worker path.
 | `CF_ACCOUNT_ID`         | Cloudflare account ID for Workers Builds API  |
 
 Provision all secrets via `wrangler secret put <KEY>` using tokens from **chittysecrets**
-(not `.chittyconnect.yml` / 1Password, which is sunset).
+(not `.chittyconnect.yml` / 1Password; 1Password plumbing inside chittyconnect is moving to chittysecrets).
 
 ---
 
@@ -163,9 +163,11 @@ limit. Results are written to `health_checks` and rows older than 7 days are pru
 
 ### Background
 
-chittyconnect previously exposed a GitHub webhook receiver tied to the 1Password
-credential pipeline. With chittyconnect sunset, this responsibility transfers to
-chittymonitor (the logical owner of CI/CD event data).
+chittyconnect previously bundled a GitHub webhook receiver alongside its 1Password
+credential pipeline. As chittyconnect sheds that credential weight (1Password →
+chittysecrets) and reduces surface area, the webhook handler is offloaded here.
+chittyconnect itself stays live as the context, session, orchestration, and memory
+spine of ChittyOS — this is purely a responsibility handoff, not a decommission.
 
 ### Endpoint
 

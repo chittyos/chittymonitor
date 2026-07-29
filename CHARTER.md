@@ -51,9 +51,10 @@ runtimes (Replit, GitHub Actions, Vercel, Cloudflare Workers).
 4. **Package operation recording** — Accept package install events from chittypm via
    `POST /api/chittypm/sync`, persist to `packages` table.
 
-5. **GitHub webhook handling** *(absorbing from chittyconnect)* — Receive
-   `POST /webhook/github` push and pull-request events; trigger CF Workers Builds; post
-   GitHub commit-status updates back via GitHub API. See CHITTY.md §Webhook Spec.
+5. **GitHub webhook handling** *(offloaded from chittyconnect)* — Receive
+   `POST /webhook/github` push and PR events; trigger CF Workers Builds; report GitHub commit status back.
+   chittyconnect sheds this responsibility to reduce its surface area; chittyconnect itself stays live.
+   See CHITTY.md §Webhook Spec.
 
 6. **chittybeacon absorption** *(migration target)* — `beacon.chitty.cc` currently
    handles `/health`, `/status`, `/check` as a standalone worker. These capabilities
@@ -91,9 +92,11 @@ runtimes (Replit, GitHub Actions, Vercel, Cloudflare Workers).
 
 ## Migration Obligations
 
-1. **chittyconnect sunset** — `.chittyconnect.yml` references 1Password vault
-   (`op://ChittyOS/chittymonitor-prod`). This MUST be migrated to chittysecrets before
-   chittyconnect is decommissioned. Tracked in F-039 / chittyconnect sunset work item.
+1. **chittyconnect credential offload** — `.chittyconnect.yml` references 1Password vault
+   (`op://ChittyOS/chittymonitor-prod`). The 1Password credential plumbing inside
+   chittyconnect is moving to **chittysecrets**; chittyconnect itself remains live as the
+   orchestration spine of ChittyOS. This repo's `.chittyconnect.yml` `vault: 1password`
+   entry must be updated to use chittysecrets once that migration lands. Tracked in F-039.
 
 2. **chittybeacon deprecation** — `beacon.chitty.cc` to redirect (301) to
    `monitor.chitty.cc` after beacon endpoints are live here. Do not break beacon.chitty.cc
