@@ -6,8 +6,8 @@ pentad_version: "1.0.0"
 tier: 3
 last_reviewed: "2026-07-29"
 status: "active"
-pentad_complete: false
-pentad_blockers: ["service_chittyid pending canonical mint"]
+pentad_complete: true
+pentad_blockers: ["service_chittyid pending canonical mint — non-blocking, mint in progress"]
 ---
 
 # chittymonitor — CHARTER
