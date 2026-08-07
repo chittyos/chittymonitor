@@ -12,7 +12,7 @@
     "tail": "wrangler tail"
   },
   "dependencies": {
-    "agents": "^0.16.2",
+    "agents": "^0.19.0",
     "hono": "^4.12.15"
   },
   "devDependencies": {
