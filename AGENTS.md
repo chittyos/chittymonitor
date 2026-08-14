@@ -25,15 +25,16 @@ chittymonitor is a **Cloudflare Worker + Durable Object** service. The deployed 
 
 ## 2. Eligible operations by tier
 
-| Operation | Endpoint | Auth | Agent tier |
-|---|---|---|---|
-| Read ecosystem health | `GET /api/health/latest` | none | any |
-| Read per-service history | `GET /api/health/:service` | none | any |
-| Read ecosystem summary | `GET /status` | none | any |
-| Register app heartbeat | `POST /track` | Bearer token | trusted |
-| Ingest CI/CD record | `POST /api/chittyflow/workflows` | Bearer token | trusted |
-| Trigger health sweep | `POST /check` | Bearer token | trusted |
-| Receive GitHub webhook | `POST /webhook/github` | HMAC | github-app only |
+| Operation | Endpoint | Auth | Agent tier | Status |
+|---|---|---|---|---|
+| Read ecosystem health | `GET /api/health/latest` | none | any | deployed |
+| Read per-service history | `GET /api/health/:service/history` | none | any | deployed |
+| Trigger health sweep | `GET /api/health/sweep` | none | any | deployed |
+| Register app heartbeat | `POST /track` | Bearer token | trusted | deployed |
+| Ingest CI/CD record | `POST /api/chittyflow/workflows` | Bearer token | trusted | deployed |
+| Read ecosystem summary | `GET /status` | none | any | planned |
+| Trigger health sweep (auth) | `POST /check` | Bearer token | trusted | planned |
+| Receive GitHub webhook | `POST /webhook/github` | HMAC | github-app only | planned |
 
 ## 3. Data model
 
@@ -73,7 +74,7 @@ curl https://monitor.chitty.cc/api/health/latest
 2. **No `crypto.randomUUID()` or `fetch()` at module global scope** — CF Workers restriction. All calls inside handlers or `onStart()`.
 3. **Sweep concurrency cap** — `CONCURRENCY = 6`. Do not raise it.
 4. **Secrets via chittysecrets** — not 1Password, not `.env`. Provision with `wrangler secret put`.
-5. **agents SDK** — minimum `^0.16.2`. Current `package.json` pins `^0.14.5` — upgrade before next deploy.
+5. **agents SDK** — minimum `^0.16.2`. Current version: `^0.19.0`.
 6. **Wrangler config** — `compatibility_flags: ["nodejs_compat"]` (not `node_compat: true`). `workers_dev: false`. Tail consumer `chittytrack` must remain.
 
 ## 6. Upcoming features (not yet deployed)

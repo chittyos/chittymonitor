@@ -16,7 +16,7 @@
     "hono": "^4.12.15"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20260702.1",
+    "@cloudflare/workers-types": "^5.20260708.1",
     "typescript": "^5.8.0",
     "vitest": "^4.1.0",
     "wrangler": "^4.110.0"

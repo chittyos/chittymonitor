@@ -73,8 +73,8 @@ Rotation policy per SOP-080. Never stored in `.env`, never committed.
 
 | Risk | Mitigation |
 |---|---|
-| Webhook replay attack | `X-Hub-Signature-256` validation on every request; reject unsigned |
-| Sweep poisoning (malicious `/health` response) | Responses stored as text; no `eval`/`JSON.parse` of untrusted structure beyond status code + latency |
+| Webhook replay attack | `X-Hub-Signature-256` validation on every request; reject unsigned; persist GitHub delivery IDs (`X-GitHub-Delivery` header) and reject duplicate/replayed IDs (TODO: implement replay protection in webhook handler) |
+| Sweep poisoning (malicious `/health` response) | Only `status` field extracted via `resp.json()`; raw response bodies not stored; no `eval` |
 | `webhook_configs` table tampered → wrong repo deployed | Writes require `CHITTY_AUTH_SERVICE_TOKEN`; table maps repo → script name only (no arbitrary code) |
 | CF token over-scoped | `CF_API_TOKEN` scoped to `Workers Builds:Edit` only — no KV/R2/D1 access |
 | Sweep concurrency abuse | `CONCURRENCY = 6` hard cap — can't be externally adjusted |
@@ -87,7 +87,7 @@ Rotation policy per SOP-080. Never stored in `.env`, never committed.
 - **Escalation**:
   - L1: ChittyOps oncall
   - L2: ChittyFoundation governance council
-- **Critical incident** (webhook_configs tampered, wrong deploy triggered): revoke `CF_API_TOKEN` immediately; audit CF Builds history
+- **Critical incident** (webhook_configs tampered, wrong deploy triggered): revoke `CHITTY_AUTH_SERVICE_TOKEN` immediately to disable configuration writes; revoke `CF_API_TOKEN` to halt deploys; audit CF Builds history
 
 ## 7. Audit logging
 
@@ -95,4 +95,4 @@ Rotation policy per SOP-080. Never stored in `.env`, never committed.
 - **Build triggered** → logged with CF version ID
 - **Sweep results** → `health_checks` table (7-day retention)
 - **Token validation failures** → logged; 3 failures/min triggers alert (future)
-- Tail consumer: `chittytrack` (all requests)
+- Tail consumer: `chittytrack` receives all requests; sensitive data (Bearer tokens, GitHub webhook signatures/bodies, `Authorization` headers) should be redacted before forwarding; log retention period and access controls TODO: document
